@@ -23,6 +23,10 @@ args = "time_tracker_app"
 task = "workflow.run"
 args = "Enhanced Time Tracker"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Web Interface"
+
 [[workflows.workflow]]
 name = "Time Tracker App"
 author = "agent"
@@ -46,3 +50,16 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python main_enhanced.py"
+
+[[workflows.workflow]]
+name = "Web Interface"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python web_app.py"
+waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80

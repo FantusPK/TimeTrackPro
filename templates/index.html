@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracker - Web Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+
+        .current-task {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .current-task.no-task {
+            background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+        }
+
+        .task-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .task-details {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .timer {
+            font-size: 2.5rem;
+            font-weight: 300;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .quick-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .task-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .task-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .duration {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcdd2;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c8e6c9;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .task-details {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .timer {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Time Tracker</h1>
+            <p>Track your time efficiently from anywhere</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Current Task Section -->
+            <div class="section current-task" id="currentTaskSection">
+                <div class="loading">Loading current task...</div>
+            </div>
+
+            <!-- Start New Task Section -->
+            <div class="section">
+                <h2>Start New Task</h2>
+                <form id="startTaskForm">
+                    <div class="form-group">
+                        <label for="taskDescription">Task Description</label>
+                        <input type="text" id="taskDescription" class="form-control" placeholder="Enter task description..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categorySelect">Category</label>
+                        <select id="categorySelect" class="form-control">
+                            <option value="">Loading categories...</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Start Task</button>
+                </form>
+            </div>
+
+            <!-- Quick Tasks Section -->
+            <div class="section">
+                <h2>Quick Tasks</h2>
+                <div id="quickButtons" class="quick-buttons">
+                    <div class="loading">Loading quick tasks...</div>
+                </div>
+            </div>
+
+            <!-- Recent Tasks and Reports -->
+            <div class="section">
+                <h2>Activity</h2>
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('recent')">Recent Tasks</button>
+                    <button class="tab" onclick="showTab('reports')">Reports</button>
+                    <button class="tab" onclick="showTab('manage')">Manage</button>
+                </div>
+
+                <div id="recentTab" class="tab-content active">
+                    <div id="recentTasks" class="task-list">
+                        <div class="loading">Loading recent tasks...</div>
+                    </div>
+                </div>
+
+                <div id="reportsTab" class="tab-content">
+                    <div class="form-group">
+                        <label for="reportCategory">Filter by Category</label>
+                        <select id="reportCategory" class="form-control" onchange="filterTasks()">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div id="filteredTasks" class="task-list">
+                        <div class="loading">Loading reports...</div>
+                    </div>
+                </div>
+
+                <div id="manageTab" class="tab-content">
+                    <h3>Add Category</h3>
+                    <form id="addCategoryForm" style="margin-bottom: 30px;">
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" id="categoryName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryColor">Color</label>
+                            <input type="color" id="categoryColor" class="form-control" value="#4CAF50">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </form>
+
+                    <h3>Add Quick Task</h3>
+                    <form id="addQuickTaskForm">
+                        <div class="form-group">
+                            <label for="quickTaskName">Task Name</label>
+                            <input type="text" id="quickTaskName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quickTaskCategory">Category</label>
+                            <select id="quickTaskCategory" class="form-control">
+                                <option value="">No Category</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Quick Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTaskTimer = null;
+        let currentTaskData = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentTask();
+            loadCategories();
+            loadQuickButtons();
+            loadRecentTasks();
+            
+            // Set up forms
+            document.getElementById('startTaskForm').addEventListener('submit', startTask);
+            document.getElementById('addCategoryForm').addEventListener('submit', addCategory);
+            document.getElementById('addQuickTaskForm').addEventListener('submit', addQuickTask);
+        });
+
+        // API helpers
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`/api${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Request failed');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // Load current task
+        async function loadCurrentTask() {
+            try {
+                const task = await apiCall('/tasks/current');
+                updateCurrentTaskDisplay(task);
+                
+                if (task) {
+                    currentTaskData = task;
+                    startTimer();
+                }
+            } catch (error) {
+                document.getElementById('currentTaskSection').innerHTML = `
+                    <div class="error">Failed to load current task: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Update current task display
+        function updateCurrentTaskDisplay(task) {
+            const section = document.getElementById('currentTaskSection');
+            
+            if (!task) {
+                section.className = 'section current-task no-task';
+                section.innerHTML = `
+                    <div class="task-info">
+                        <h3>No Active Task</h3>
+                        <p>Start a new task to begin tracking time</p>
+                    </div>
+                `;
+                return;
+            }
+
+            section.className = 'section current-task';
+            const startTime = new Date(task.start_time);
+            const duration = formatDuration(task.duration_seconds);
+            
+            section.innerHTML = `
+                <div class="task-info">
+                    <h3>${task.task_description}</h3>
+                    <div class="timer" id="currentTimer">${duration}</div>
+                    <div class="task-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Category</div>
+                            <div class="detail-value">${task.category_name || 'None'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Started</div>
+                            <div class="detail-value">${startTime.toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="stopCurrentTask()" style="margin-top: 20px;">
+                        Stop Task
+                    </button>
+                </div>
+            `;
+        }
+
+        // Timer functions
+        function startTimer() {
+            if (currentTaskTimer) clearInterval(currentTaskTimer);
+            
+            currentTaskTimer = setInterval(() => {
+                if (currentTaskData) {
+                    const startTime = new Date(currentTaskData.start_time);
+                    const now = new Date();
+                    const duration = Math.floor((now - startTime) / 1000);
+                    
+                    const timerElement = document.getElementById('currentTimer');
+                    if (timerElement) {
+                        timerElement.textContent = formatDuration(duration);
+                    }
+                }
+            }, 1000);
+        }
+
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Task management
+        async function startTask(event) {
+            event.preventDefault();
+            
+            const taskDescription = document.getElementById('taskDescription').value.trim();
+            const categoryId = document.getElementById('categorySelect').value || null;
+            
+            if (!taskDescription) {
+                alert('Please enter a task description');
+                return;
+            }
+
+            try {
+                const task = await apiCall('/tasks/start', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        task_description: taskDescription,
+                        category_id: categoryId ? parseInt(categoryId) : null
+                    })
+                });
+
+                // Clear form
+                document.getElementById('taskDescription').value = '';
+                
+                // Reload current task
+                loadCurrentTask();
+                loadRecentTasks();
+                
+                showMessage('Task started successfully!', 'success');
+            } catch (error) {
+                showMessage(`Failed to start task: ${error.message}`, 'error');
+            }
+        }
+
+        async function stopCurrentTask() {
+            try {
+                await apiCall('/tasks/stop', { method: 'POST' });
+                
+                // Clear timer
+                if (currentTaskTimer) {
+                    clearInterval(currentTaskTimer);
+                    currentTaskTimer = null;
+                }
+                currentTaskData = null;
+                
+                // Reload displays
+                loadCurrentTask();
+                loadRecentTasks();
+                
+                showMessage('Task stopped successfully!', 'success');
+            } catch (error) {
+                showMessage(`Failed to stop task: ${error.message}`, 'error');
+            }
+        }
+
+        async function startQuickTask(taskName, categoryId) {
+            try {
+                await apiCall('/tasks/start', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        task_description: taskName,
+                        category_id: categoryId
+                    })
+                });
+
+                loadCurrentTask();
+                loadRecentTasks();
+                showMessage(`Started quick task: ${taskName}`, 'success');
+            } catch (error) {
+                showMessage(`Failed to start quick task: ${error.message}`, 'error');
+            }
+        }
+
+        // Load data functions
+        async function loadCategories() {
+            try {
+                const categories = await apiCall('/categories');
+                
+                // Update category selects
+                const selects = ['categorySelect', 'reportCategory', 'quickTaskCategory'];
+                selects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    const currentValue = select.value;
+                    
+                    select.innerHTML = selectId === 'reportCategory' ? 
+                        '<option value="">All Categories</option>' : 
+                        '<option value="">No Category</option>';
+                    
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        select.appendChild(option);
+                    });
+                    
+                    if (currentValue) select.value = currentValue;
+                });
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+            }
+        }
+
+        async function loadQuickButtons() {
+            try {
+                const buttons = await apiCall('/quick-buttons');
+                const container = document.getElementById('quickButtons');
+                
+                if (buttons.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d;">No quick tasks configured</p>';
+                    return;
+                }
+
+                container.innerHTML = buttons.map(btn => `
+                    <button class="quick-btn" 
+                            style="background-color: ${btn.category_color || '#4CAF50'}"
+                            onclick="startQuickTask('${btn.task_name}', ${btn.category_id || 'null'})">
+                        ${btn.task_name}
+                        ${btn.category_name ? `<br><small>${btn.category_name}</small>` : ''}
+                    </button>
+                `).join('');
+            } catch (error) {
+                document.getElementById('quickButtons').innerHTML = `
+                    <div class="error">Failed to load quick tasks: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function loadRecentTasks() {
+            try {
+                const tasks = await apiCall('/tasks/recent?limit=10');
+                const container = document.getElementById('recentTasks');
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d;">No recent tasks</p>';
+                    return;
+                }
+
+                container.innerHTML = tasks.map(task => {
+                    const startTime = new Date(task.start_time);
+                    const endTime = task.end_time ? new Date(task.end_time) : null;
+                    const duration = task.duration_minutes ? `${Math.round(task.duration_minutes)}m` : 'In progress';
+                    
+                    return `
+                        <div class="task-item">
+                            <div>
+                                <div class="task-name">${task.task_description}</div>
+                                <div class="task-meta">
+                                    ${task.category_name ? `<span class="category-badge" style="background-color: ${task.category_color}">${task.category_name}</span>` : ''}
+                                    ${startTime.toLocaleDateString()} ${startTime.toLocaleTimeString()}
+                                    ${endTime ? ` - ${endTime.toLocaleTimeString()}` : ''}
+                                </div>
+                            </div>
+                            <div class="duration">${duration}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                document.getElementById('recentTasks').innerHTML = `
+                    <div class="error">Failed to load recent tasks: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Management functions
+        async function addCategory(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('categoryName').value.trim();
+            const color = document.getElementById('categoryColor').value;
+            
+            try {
+                await apiCall('/categories', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, color })
+                });
+
+                document.getElementById('categoryName').value = '';
+                document.getElementById('categoryColor').value = '#4CAF50';
+                
+                loadCategories();
+                showMessage('Category added successfully!', 'success');
+            } catch (error) {
+                showMessage(`Failed to add category: ${error.message}`, 'error');
+            }
+        }
+
+        async function addQuickTask(event) {
+            event.preventDefault();
+            
+            const taskName = document.getElementById('quickTaskName').value.trim();
+            const categoryId = document.getElementById('quickTaskCategory').value || null;
+            
+            try {
+                await apiCall('/quick-buttons', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        task_name: taskName,
+                        category_id: categoryId ? parseInt(categoryId) : null
+                    })
+                });
+
+                document.getElementById('quickTaskName').value = '';
+                document.getElementById('quickTaskCategory').value = '';
+                
+                loadQuickButtons();
+                showMessage('Quick task added successfully!', 'success');
+            } catch (error) {
+                showMessage(`Failed to add quick task: ${error.message}`, 'error');
+            }
+        }
+
+        // Filter tasks by category
+        async function filterTasks() {
+            const categoryId = document.getElementById('reportCategory').value;
+            const container = document.getElementById('filteredTasks');
+            
+            try {
+                const tasks = categoryId ? 
+                    await apiCall(`/tasks/by-category/${categoryId}`) :
+                    await apiCall('/tasks/recent?limit=50');
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d;">No tasks found</p>';
+                    return;
+                }
+
+                container.innerHTML = tasks.map(task => {
+                    const startTime = new Date(task.start_time);
+                    const endTime = task.end_time ? new Date(task.end_time) : null;
+                    const duration = task.duration_minutes ? `${Math.round(task.duration_minutes)}m` : 'In progress';
+                    
+                    return `
+                        <div class="task-item">
+                            <div>
+                                <div class="task-name">${task.task_description}</div>
+                                <div class="task-meta">
+                                    ${task.category_name ? `<span class="category-badge" style="background-color: ${task.category_color}">${task.category_name}</span>` : ''}
+                                    ${startTime.toLocaleDateString()} ${startTime.toLocaleTimeString()}
+                                    ${endTime ? ` - ${endTime.toLocaleTimeString()}` : ''}
+                                </div>
+                            </div>
+                            <div class="duration">${duration}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                container.innerHTML = `<div class="error">Failed to load tasks: ${error.message}</div>`;
+            }
+        }
+
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data for reports tab
+            if (tabName === 'reports') {
+                filterTasks();
+            }
+        }
+
+        // Utility functions
+        function showMessage(message, type) {
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            
+            // Insert at top of main content
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(messageDiv, mainContent.firstChild);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (currentTaskData) {
+                loadCurrentTask();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
