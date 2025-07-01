@@ -74,6 +74,7 @@ Preferred communication style: Simple, everyday language.
 - July 01, 2025: Successfully deployed lightweight time tracking desktop application
 - Application confirmed working on user's desktop with full GUI functionality
 - All core features operational: task switching, auto-close, CSV logging, real-time display
+- Enhanced window resizing: larger default size (600x500), minimum size limits, fully resizable interface
 
 ## Changelog
 
