@@ -16,8 +16,14 @@ import datetime
 import threading
 import time
 import os
+import sys
 from pathlib import Path
 from models import DatabaseManager
+
+# Hide console window on Windows
+if os.name == 'nt':
+    import ctypes
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 class EnhancedTimeTracker:
     def __init__(self):

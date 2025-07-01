@@ -16,7 +16,13 @@ import datetime
 import threading
 import time
 import os
+import sys
 from pathlib import Path
+
+# Hide console window on Windows
+if os.name == 'nt':
+    import ctypes
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 class TimeTracker:
     def __init__(self):

@@ -84,6 +84,7 @@ Preferred communication style: Simple, everyday language.
 - Built comprehensive web interface accessible from any browser
 - Automatic task resumption on startup for interrupted work sessions
 - Configured timezone to match Windows system settings
+- Hidden Python console window for clean desktop application appearance
 
 ## Changelog
 
