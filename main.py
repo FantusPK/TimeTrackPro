@@ -22,7 +22,8 @@ class TimeTracker:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Time Tracker")
-        self.root.geometry("500x400")
+        self.root.geometry("600x500")
+        self.root.minsize(400, 300)  # Set minimum window size
         self.root.resizable(True, True)
         
         # Application state
