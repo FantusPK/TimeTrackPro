@@ -497,7 +497,7 @@
 
             section.className = 'section current-task';
             const startTime = new Date(task.start_time);
-            const duration = formatDuration(task.duration_seconds);
+            const duration = formatDuration(task.duration_seconds || 0);
             
             section.innerHTML = `
                 <div class="task-info">
@@ -524,15 +524,19 @@
         function startTimer() {
             if (currentTaskTimer) clearInterval(currentTaskTimer);
             
+            let elapsedSeconds = currentTaskData.duration_seconds || 0;
+            const startTime = new Date();
+            
             currentTaskTimer = setInterval(() => {
                 if (currentTaskData) {
-                    const startTime = new Date(currentTaskData.start_time);
+                    // Calculate elapsed time since timer started plus initial duration
                     const now = new Date();
-                    const duration = Math.floor((now - startTime) / 1000);
+                    const timerRunTime = Math.floor((now - startTime) / 1000);
+                    const totalDuration = elapsedSeconds + timerRunTime;
                     
                     const timerElement = document.getElementById('currentTimer');
                     if (timerElement) {
-                        timerElement.textContent = formatDuration(duration);
+                        timerElement.textContent = formatDuration(totalDuration);
                     }
                 }
             }, 1000);
