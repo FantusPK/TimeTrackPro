@@ -19,6 +19,10 @@ args = "Time Tracker App"
 task = "workflow.run"
 args = "time_tracker_app"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Enhanced Time Tracker"
+
 [[workflows.workflow]]
 name = "Time Tracker App"
 author = "agent"
@@ -34,3 +38,11 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python main.py"
+
+[[workflows.workflow]]
+name = "Enhanced Time Tracker"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main_enhanced.py"

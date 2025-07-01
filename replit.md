@@ -75,6 +75,12 @@ Preferred communication style: Simple, everyday language.
 - Application confirmed working on user's desktop with full GUI functionality
 - All core features operational: task switching, auto-close, CSV logging, real-time display
 - Enhanced window resizing: larger default size (600x500), minimum size limits, fully resizable interface
+- Added task categorization with color-coded categories (Work, Personal, Learning, Other)
+- Implemented customizable quick-access task buttons with category assignment
+- Integrated PostgreSQL online database for cloud storage and synchronization
+- Added "Always on Top" checkbox feature to keep window visible above other applications
+- Created tabbed interface with Categories, Quick Tasks, and Reports sections
+- Advanced filtering and reporting capabilities by category
 
 ## Changelog
 
