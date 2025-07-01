@@ -22,8 +22,12 @@ from models import DatabaseManager
 
 # Hide console window on Windows
 if os.name == 'nt':
-    import ctypes
-    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+    try:
+        import ctypes
+        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+    except Exception:
+        # If hiding console fails, continue without it
+        pass
 
 class EnhancedTimeTracker:
     def __init__(self):
@@ -1009,6 +1013,12 @@ class EnhancedTimeTracker:
         self.root.mainloop()
 
 if __name__ == "__main__":
-    # Start the enhanced application
-    app = EnhancedTimeTracker()
-    app.run()
+    try:
+        # Start the enhanced application
+        app = EnhancedTimeTracker()
+        app.run()
+    except Exception as e:
+        print(f"Error starting Enhanced Time Tracker: {e}")
+        import traceback
+        traceback.print_exc()
+        input("Press Enter to exit...")  # Keep window open to see error
