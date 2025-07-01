@@ -496,7 +496,7 @@
             }
 
             section.className = 'section current-task';
-            const startTime = new Date(task.start_time);
+            const startTime = parseUtcTime(task.start_time);
             const duration = formatDuration(task.duration_seconds || 0);
             
             section.innerHTML = `
@@ -687,8 +687,8 @@
                 }
 
                 container.innerHTML = tasks.map(task => {
-                    const startTime = new Date(task.start_time);
-                    const endTime = task.end_time ? new Date(task.end_time) : null;
+                    const startTime = parseUtcTime(task.start_time);
+                    const endTime = task.end_time ? parseUtcTime(task.end_time) : null;
                     const duration = task.duration_minutes ? `${Math.round(task.duration_minutes)}m` : 'In progress';
                     
                     return `
@@ -776,8 +776,8 @@
                 }
 
                 container.innerHTML = tasks.map(task => {
-                    const startTime = new Date(task.start_time);
-                    const endTime = task.end_time ? new Date(task.end_time) : null;
+                    const startTime = parseUtcTime(task.start_time);
+                    const endTime = task.end_time ? parseUtcTime(task.end_time) : null;
                     const duration = task.duration_minutes ? `${Math.round(task.duration_minutes)}m` : 'In progress';
                     
                     return `
@@ -820,6 +820,11 @@
         }
 
         // Utility functions
+        function parseUtcTime(timeString) {
+            // Ensure UTC timezone designation for proper local conversion
+            return new Date(timeString + (timeString.includes('Z') ? '' : 'Z'));
+        }
+
         function showMessage(message, type) {
             // Create message element
             const messageDiv = document.createElement('div');
