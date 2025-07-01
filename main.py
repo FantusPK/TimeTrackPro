@@ -394,10 +394,54 @@ def create_sample_csv():
             writer = csv.writer(file)
             writer.writerow(['Task Description', 'Start Time', 'End Time', 'Duration (minutes)', 'Date'])
 
+def check_display_environment():
+    """Check if we have a display environment for GUI"""
+    if os.name == 'nt':  # Windows
+        return True
+    else:  # Linux/Unix
+        return 'DISPLAY' in os.environ
+
 if __name__ == "__main__":
-    # Create sample CSV file
-    create_sample_csv()
+    # Check if we can run GUI applications
+    if not check_display_environment():
+        print("=" * 60)
+        print("DESKTOP APPLICATION - DISPLAY ENVIRONMENT REQUIRED")
+        print("=" * 60)
+        print("This desktop application requires a graphical environment to run.")
+        print("It appears you're running this on a server without display support.")
+        print()
+        print("OPTIONS:")
+        print("1. Run this on your local Windows/Mac/Linux desktop computer")
+        print("2. Use the web interface instead: python web_app.py")
+        print("3. Access the web interface at: http://localhost:5000")
+        print()
+        print("The web interface provides the same functionality in your browser!")
+        print("=" * 60)
+        sys.exit(0)
     
-    # Start the application
-    app = TimeTracker()
-    app.run()
+    try:
+        # Create sample CSV file
+        create_sample_csv()
+        
+        # Start the application
+        app = TimeTracker()
+        app.run()
+    except tk.TclError as e:
+        print("=" * 60)
+        print("DISPLAY ERROR - GUI CANNOT START")
+        print("=" * 60)
+        print(f"GUI Error: {e}")
+        print()
+        print("This error typically means:")
+        print("- No graphical display is available")
+        print("- Running on a server without GUI support")
+        print("- X11 forwarding is not enabled (Linux)")
+        print()
+        print("SOLUTION: Use the web interface instead!")
+        print("Run: python web_app.py")
+        print("Then open: http://localhost:5000")
+        print("=" * 60)
+    except Exception as e:
+        print(f"Error starting Time Tracker: {e}")
+        import traceback
+        traceback.print_exc()

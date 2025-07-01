@@ -85,6 +85,9 @@ Preferred communication style: Simple, everyday language.
 - Automatic task resumption on startup for interrupted work sessions
 - Configured timezone to match Windows system settings
 - Hidden Python console window for clean desktop application appearance
+- Added intelligent display environment detection for desktop applications
+- Enhanced error handling with clear guidance when GUI environment unavailable
+- Created comprehensive README.md with usage instructions for all interfaces
 
 ## Changelog
 
