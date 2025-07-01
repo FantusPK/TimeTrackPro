@@ -944,7 +944,18 @@
             }
 
             try {
-                await apiCall(`/categories/${categoryId}`, 'DELETE');
+                const response = await fetch(`/api/categories/${categoryId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
                 await loadCategoriesList();
                 await loadCategories();
                 showMessage('Category deleted successfully', 'success');
@@ -960,7 +971,18 @@
             }
 
             try {
-                await apiCall(`/quick-buttons/${taskId}`, 'DELETE');
+                const response = await fetch(`/api/quick-buttons/${taskId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
                 await loadQuickTasksList();
                 await loadQuickButtons();
                 showMessage('Quick task deleted successfully', 'success');
