@@ -103,6 +103,18 @@ def delete_quick_button(button_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/categories/<int:category_id>', methods=['DELETE'])
+def delete_category(category_id):
+    """Delete a category"""
+    if not db:
+        return jsonify({'error': 'Database not available'}), 500
+    
+    try:
+        db.delete_category(category_id)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/tasks/current')
 def get_current_task():
     """Get current running task"""

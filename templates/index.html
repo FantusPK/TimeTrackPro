@@ -306,6 +306,39 @@
             border: 1px solid #c8e6c9;
         }
 
+        .manage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        .manage-item-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -404,8 +437,13 @@
                         <button type="submit" class="btn btn-primary">Add Category</button>
                     </form>
 
+                    <h3>Manage Categories</h3>
+                    <div id="categoriesList" style="margin-bottom: 30px;">
+                        <div class="loading">Loading categories...</div>
+                    </div>
+
                     <h3>Add Quick Task</h3>
-                    <form id="addQuickTaskForm">
+                    <form id="addQuickTaskForm" style="margin-bottom: 30px;">
                         <div class="form-group">
                             <label for="quickTaskName">Task Name</label>
                             <input type="text" id="quickTaskName" class="form-control" required>
@@ -418,6 +456,11 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Add Quick Task</button>
                     </form>
+
+                    <h3>Manage Quick Tasks</h3>
+                    <div id="quickTasksList">
+                        <div class="loading">Loading quick tasks...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -433,6 +476,8 @@
             loadCategories();
             loadQuickButtons();
             loadRecentTasks();
+            loadCategoriesList();
+            loadQuickTasksList();
             
             // Set up forms
             document.getElementById('startTaskForm').addEventListener('submit', startTask);
@@ -839,6 +884,89 @@
             setTimeout(() => {
                 messageDiv.remove();
             }, 5000);
+        }
+
+        // Load categories list for management
+        async function loadCategoriesList() {
+            try {
+                const categories = await apiCall('/categories');
+                const container = document.getElementById('categoriesList');
+                
+                if (categories.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d;">No categories found</p>';
+                    return;
+                }
+
+                container.innerHTML = categories.map(cat => `
+                    <div class="manage-item">
+                        <div class="manage-item-info">
+                            <span class="category-badge" style="background-color: ${cat.color};">${cat.name}</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${cat.id})">Delete</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                document.getElementById('categoriesList').innerHTML = '<div class="error">Error loading categories</div>';
+            }
+        }
+
+        // Load quick tasks list for management
+        async function loadQuickTasksList() {
+            try {
+                const quickTasks = await apiCall('/quick-buttons');
+                const container = document.getElementById('quickTasksList');
+                
+                if (quickTasks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d;">No quick tasks found</p>';
+                    return;
+                }
+
+                container.innerHTML = quickTasks.map(task => `
+                    <div class="manage-item">
+                        <div class="manage-item-info">
+                            <span>${task.task_name}</span>
+                            ${task.category_name ? `<span class="category-badge" style="background-color: ${task.category_color}; margin-left: 10px;">${task.category_name}</span>` : ''}
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteQuickTask(${task.id})">Delete</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading quick tasks:', error);
+                document.getElementById('quickTasksList').innerHTML = '<div class="error">Error loading quick tasks</div>';
+            }
+        }
+
+        // Delete category
+        async function deleteCategory(categoryId) {
+            if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                await apiCall(`/categories/${categoryId}`, 'DELETE');
+                await loadCategoriesList();
+                await loadCategories();
+                showMessage('Category deleted successfully', 'success');
+            } catch (error) {
+                showMessage('Failed to delete category: ' + error.message, 'error');
+            }
+        }
+
+        // Delete quick task
+        async function deleteQuickTask(taskId) {
+            if (!confirm('Are you sure you want to delete this quick task? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                await apiCall(`/quick-buttons/${taskId}`, 'DELETE');
+                await loadQuickTasksList();
+                await loadQuickButtons();
+                showMessage('Quick task deleted successfully', 'success');
+            } catch (error) {
+                showMessage('Failed to delete quick task: ' + error.message, 'error');
+            }
         }
 
         // Auto-refresh every 30 seconds

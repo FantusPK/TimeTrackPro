@@ -158,6 +158,23 @@ class DatabaseManager:
         finally:
             cursor.close()
             conn.close()
+
+    def delete_category(self, category_id):
+        """Delete a category"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # First, update any tasks using this category to have no category
+            cursor.execute("UPDATE tasks SET category_id = NULL WHERE category_id = %s", (category_id,))
+            # Update any custom buttons using this category to have no category
+            cursor.execute("UPDATE custom_buttons SET category_id = NULL WHERE category_id = %s", (category_id,))
+            # Delete the category
+            cursor.execute("DELETE FROM categories WHERE id = %s", (category_id,))
+            conn.commit()
+        finally:
+            cursor.close()
+            conn.close()
     
     def add_task(self, task_description, category_id, start_time):
         """Add a new task to the database"""

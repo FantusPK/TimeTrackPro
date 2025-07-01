@@ -529,6 +529,34 @@ class EnhancedTimeTracker:
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to delete custom button: {str(e)}")
+
+    def delete_category(self):
+        """Delete selected category"""
+        if not self.db:
+            messagebox.showwarning("Database Error", "Database not available")
+            return
+        
+        selection = self.categories_tree.selection()
+        if not selection:
+            messagebox.showwarning("Warning", "Please select a category to delete")
+            return
+        
+        item = selection[0]
+        category_id = self.categories_tree.item(item, 'tags')[0]
+        category_name = self.categories_tree.item(item, 'text')
+        
+        if messagebox.askyesno("Confirm Delete", f"Delete category '{category_name}'?\n\nThis will remove the category from all existing tasks and quick buttons."):
+            try:
+                self.db.delete_category(category_id)
+                
+                # Refresh displays
+                self.load_categories()
+                self.load_categories_tree()
+                self.load_quick_buttons()
+                messagebox.showinfo("Success", f"Category '{category_name}' deleted successfully")
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to delete category: {str(e)}")
     
     def start_quick_task(self, task_name, category_id):
         """Start a task from quick button"""
