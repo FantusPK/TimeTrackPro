@@ -81,6 +81,9 @@ Preferred communication style: Simple, everyday language.
 - Added "Always on Top" checkbox feature to keep window visible above other applications
 - Created tabbed interface with Categories, Quick Tasks, and Reports sections
 - Advanced filtering and reporting capabilities by category
+- Built comprehensive web interface accessible from any browser
+- Automatic task resumption on startup for interrupted work sessions
+- Configured timezone to match Windows system settings
 
 ## Changelog
 
