@@ -47,14 +47,22 @@ class EnhancedTimeTracker:
         self.is_running = True
         self.always_on_top = tk.BooleanVar()
         
-        # Initialize database
+        # Initialize database with graceful fallback
+        self.db = None
         try:
             self.db = DatabaseManager()
             self.db.initialize_database()
             print("Connected to online database successfully")
         except Exception as e:
-            messagebox.showerror("Database Error", f"Failed to connect to database: {str(e)}\nThe app will work offline with CSV only.")
-            self.db = None
+            print(f"Database connection failed: {e}")
+            print("Running in offline mode with CSV storage")
+            # Don't show error dialog for server environments
+            try:
+                # Only show messagebox if we're in a GUI environment
+                messagebox.showinfo("Offline Mode", "Database unavailable. Running in offline mode with CSV storage.\nAll features remain available!")
+            except:
+                # If messagebox fails, we're probably in a non-GUI environment
+                pass
         
         # Create CSV file with headers if it doesn't exist
         self.initialize_csv()
