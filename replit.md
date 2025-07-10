@@ -92,6 +92,8 @@ Preferred communication style: Simple, everyday language.
 - Created start_time_tracker.py launcher for automatic environment detection
 - Fixed web interface to work with CSV fallback when database unavailable
 - Resolved desktop application initialization issues with proper error handling
+- Added minimize-to-taskbar feature to enhanced standalone version for uninterrupted time tracking
+- Created standalone versions (enhanced_standalone.py, web_standalone.py) with no database dependencies
 
 ## Changelog
 

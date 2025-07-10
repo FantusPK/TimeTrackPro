@@ -189,6 +189,13 @@ class EnhancedStandaloneTracker:
         
         # Handle window closing
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        # Add minimize to taskbar support
+        self.is_minimized = False
+        
+        # Bind events for restoring from taskbar
+        self.root.bind('<Map>', self.restore_from_taskbar)  # Window restored
+        self.root.bind('<Button-1>', self.restore_from_taskbar)  # Click to restore
     
     def setup_main_tab(self):
         """Setup the main time tracking tab"""
@@ -226,6 +233,15 @@ class EnhancedStandaloneTracker:
             command=self.toggle_always_on_top
         )
         self.always_on_top_check.pack(side='left', padx=10)
+        
+        # Minimize to taskbar checkbox
+        self.minimize_to_taskbar = tk.BooleanVar(value=True)
+        self.minimize_check = ttk.Checkbutton(
+            buttons_frame,
+            text="Minimize on Close",
+            variable=self.minimize_to_taskbar
+        )
+        self.minimize_check.pack(side='left', padx=10)
         
         # Current task display
         self.current_task_label = ttk.Label(self.main_frame, text="No active task", font=('Arial', 10, 'bold'))
@@ -346,6 +362,9 @@ class EnhancedStandaloneTracker:
             self.reports_tree.heading(col, text=col)
         
         self.reports_tree.pack(fill='both', expand=True, padx=10, pady=10)
+        
+        # Add right-click menu for restore option
+        self.setup_system_tray_menu()
     
     def load_categories(self):
         """Load categories into comboboxes"""
@@ -631,6 +650,56 @@ class EnhancedStandaloneTracker:
         except Exception as e:
             print(f"Always on top not supported: {e}")
     
+    def setup_system_tray_menu(self):
+        """Setup right-click context menu for system tray functionality"""
+        try:
+            # Create a simple menu for right-click
+            self.context_menu = tk.Menu(self.root, tearoff=0)
+            self.context_menu.add_command(label="Restore Window", command=self.restore_from_taskbar)
+            self.context_menu.add_command(label="Show Current Task", command=self.show_current_task_popup)
+            self.context_menu.add_separator()
+            self.context_menu.add_command(label="Exit Application", command=self.actual_close)
+            
+            # Bind right-click to show menu
+            self.root.bind("<Button-3>", self.show_context_menu)
+            
+        except Exception as e:
+            print(f"Error setting up context menu: {e}")
+    
+    def show_context_menu(self, event):
+        """Show context menu on right-click"""
+        try:
+            self.context_menu.tk_popup(event.x_root, event.y_root)
+        except Exception as e:
+            print(f"Error showing context menu: {e}")
+        finally:
+            self.context_menu.grab_release()
+    
+    def show_current_task_popup(self):
+        """Show current task in a popup"""
+        if self.current_task:
+            duration = datetime.datetime.now() - self.task_start_time
+            hours = int(duration.total_seconds() // 3600)
+            minutes = int((duration.total_seconds() % 3600) // 60)
+            
+            if hours > 0:
+                duration_text = f"{hours:02d}:{minutes:02d}"
+            else:
+                duration_text = f"{minutes:02d} minutes"
+            
+            message = f"Current Task: {self.current_task}\nDuration: {duration_text}"
+            if self.category_var.get():
+                message += f"\nCategory: {self.category_var.get()}"
+        else:
+            message = "No active task"
+        
+        # Show in console (for when minimized)
+        print(f"Task Status: {message}")
+        
+        # Also show popup if window is visible
+        if not self.is_minimized:
+            messagebox.showinfo("Current Task", message)
+    
     def export_csv(self):
         """Export CSV to chosen location"""
         try:
@@ -649,6 +718,43 @@ class EnhancedStandaloneTracker:
     
     def on_closing(self):
         """Handle window closing"""
+        # Check if minimize to taskbar is enabled
+        if self.minimize_to_taskbar.get():
+            self.minimize_to_taskbar_action()
+        else:
+            self.actual_close()
+    
+    def minimize_to_taskbar_action(self):
+        """Minimize window to taskbar instead of closing"""
+        try:
+            # Minimize to taskbar
+            self.root.withdraw()  # Hide the window
+            self.is_minimized = True
+            
+            # Show notification in console
+            print("Time Tracker minimized to taskbar. Double-click the taskbar icon to restore.")
+            
+            # For Windows, try to minimize to system tray properly
+            if os.name == 'nt':
+                try:
+                    self.root.iconify()  # Minimize to taskbar
+                except Exception:
+                    pass  # Fallback already handled by withdraw()
+            
+        except Exception as e:
+            print(f"Error minimizing: {e}")
+            # Fallback to normal close
+            self.actual_close()
+    
+    def restore_from_taskbar(self, event=None):
+        """Restore window from taskbar"""
+        if self.is_minimized:
+            self.root.deiconify()  # Restore window
+            self.root.lift()       # Bring to front
+            self.is_minimized = False
+    
+    def actual_close(self):
+        """Actually close the application"""
         if self.current_task:
             result = messagebox.askyesno("Active Task", 
                 "You have an active task. Do you want to stop it before closing?")
