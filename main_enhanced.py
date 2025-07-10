@@ -31,11 +31,18 @@ if os.name == 'nt':
 
 class EnhancedTimeTracker:
     def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Enhanced Time Tracker")
-        self.root.geometry("800x700")
-        self.root.minsize(600, 500)
-        self.root.resizable(True, True)
+        # Check if GUI is available before creating window
+        if not check_display_environment():
+            raise RuntimeError("No display environment available")
+        
+        try:
+            self.root = tk.Tk()
+            self.root.title("Enhanced Time Tracker")
+            self.root.geometry("800x700")
+            self.root.minsize(600, 500)
+            self.root.resizable(True, True)
+        except tk.TclError as e:
+            raise RuntimeError(f"Cannot create GUI window: {e}")
         
         # Application state
         self.current_task = None
@@ -50,18 +57,22 @@ class EnhancedTimeTracker:
         # Initialize database with graceful fallback
         self.db = None
         try:
+            from models import DatabaseManager
             self.db = DatabaseManager()
             self.db.initialize_database()
             print("Connected to online database successfully")
+        except ImportError as e:
+            print(f"Database module not available: {e}")
+            print("Running in CSV-only mode")
+            self.db = None
         except Exception as e:
             print(f"Database connection failed: {e}")
             print("Running in offline mode with CSV storage")
-            # Don't show error dialog for server environments
+            self.db = None
+            # Only show notification if user wants it
             try:
-                # Only show messagebox if we're in a GUI environment
                 messagebox.showinfo("Offline Mode", "Database unavailable. Running in offline mode with CSV storage.\nAll features remain available!")
             except:
-                # If messagebox fails, we're probably in a non-GUI environment
                 pass
         
         # Create CSV file with headers if it doesn't exist

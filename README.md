@@ -1,30 +1,39 @@
 # Time Tracker Application
 
-A comprehensive time tracking solution with both desktop and web interfaces.
+A comprehensive time tracking solution with desktop and web interfaces, designed to work reliably across different environments.
 
 ## 🚀 Quick Start
 
-### Web Interface (Recommended for Server/Cloud)
+### Automatic Launcher (Recommended)
+```bash
+python start_time_tracker.py
+```
+This script automatically detects your environment and offers the best options.
+
+### Manual Options
+
+#### Web Interface (Works Everywhere)
 ```bash
 python web_app.py
 ```
 Then open your browser to: http://localhost:5000
 
-### Desktop Application (For Local Computer)
+#### Desktop Applications (Local Computer Only)
 ```bash
-python main_enhanced.py    # Enhanced version with categories
-python main.py             # Simple version
+python simple_desktop.py     # Reliable, CSV-only version
+python main_enhanced.py      # Full-featured with database
+python main.py               # Original simple version
 ```
 
 ## 📋 Features
 
 ### Desktop Applications
-- **Simple Time Tracker** (`main.py`)
+- **Simple Desktop Tracker** (`simple_desktop.py`) - **MOST RELIABLE**
   - Basic task tracking with timestamps
   - Automatic task switching
-  - 2-hour auto-close for inactive tasks
-  - CSV export
+  - CSV export and recent task display
   - Real-time duration display
+  - Lightweight and stable
 
 - **Enhanced Time Tracker** (`main_enhanced.py`)
   - All simple features plus:
@@ -33,6 +42,11 @@ python main.py             # Simple version
   - Database storage with offline CSV backup
   - Advanced filtering and reports
   - Always-on-top window option
+
+- **Original Simple Tracker** (`main.py`)
+  - Basic version with auto-close feature
+  - 2-hour auto-close for inactive tasks
+  - CSV export
 
 ### Web Interface (`web_app.py`)
 - Browser-based access to all enhanced features
