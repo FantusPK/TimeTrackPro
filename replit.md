@@ -94,6 +94,7 @@ Preferred communication style: Simple, everyday language.
 - Resolved desktop application initialization issues with proper error handling
 - Added minimize-to-taskbar feature to enhanced standalone version for uninterrupted time tracking
 - Created standalone versions (enhanced_standalone.py, web_standalone.py) with no database dependencies
+- Fixed 2-hour auto-close timer functionality in enhanced standalone version with proper threading and notifications
 
 ## Changelog
 

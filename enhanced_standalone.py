@@ -243,6 +243,10 @@ class EnhancedStandaloneTracker:
         )
         self.minimize_check.pack(side='left', padx=10)
         
+        # Test timeout button (for testing - uncomment to use)
+        # ttk.Button(buttons_frame, text="Test Timeout (10s)", 
+        #           command=self.test_timeout).pack(side='left', padx=10)
+        
         # Current task display
         self.current_task_label = ttk.Label(self.main_frame, text="No active task", font=('Arial', 10, 'bold'))
         self.current_task_label.grid(row=3, column=0, columnspan=2, pady=10)
@@ -512,6 +516,9 @@ class EnhancedStandaloneTracker:
         self.current_task = task_description
         self.task_start_time = datetime.datetime.now()
         
+        # Start auto-close timer
+        self.start_auto_close_timer()
+        
         # Update UI
         self.task_entry.delete(0, tk.END)
         self.start_btn.configure(state='disabled')
@@ -551,6 +558,11 @@ class EnhancedStandaloneTracker:
         
         print(f"Completed task: {self.current_task} ({duration:.1f} minutes)")
         
+        # Cancel auto-close timer
+        if self.auto_close_timer:
+            self.auto_close_timer.cancel()
+            self.auto_close_timer = None
+        
         # Reset state
         self.current_task = None
         self.task_start_time = None
@@ -585,6 +597,10 @@ class EnhancedStandaloneTracker:
                 duration_text = f"{minutes:02d}:{seconds:02d}"
             
             self.duration_label.configure(text=duration_text)
+            
+            # Check if task has been running for 2 hours
+            if duration.total_seconds() >= 7200:  # 2 hours = 7200 seconds
+                self.auto_close_task()
         else:
             self.current_task_label.configure(text="No active task")
             self.duration_label.configure(text="")
@@ -649,6 +665,52 @@ class EnhancedStandaloneTracker:
             self.root.attributes('-topmost', self.always_on_top.get())
         except Exception as e:
             print(f"Always on top not supported: {e}")
+    
+    def start_auto_close_timer(self):
+        """Start the 2-hour auto-close timer"""
+        # Cancel any existing timer
+        if self.auto_close_timer:
+            self.auto_close_timer.cancel()
+        
+        # Start new timer for 2 hours (7200 seconds)
+        self.auto_close_timer = threading.Timer(7200, self.auto_close_task)
+        self.auto_close_timer.daemon = True
+        self.auto_close_timer.start()
+        print("Auto-close timer started - task will close after 2 hours")
+    
+    def auto_close_task(self):
+        """Auto-close task after 2 hours"""
+        if self.current_task:
+            print(f"Auto-closing task after 2 hours: {self.current_task}")
+            try:
+                # Use thread-safe method to close task
+                self.root.after(0, self._auto_close_task_safe)
+            except Exception as e:
+                print(f"Error in auto-close: {e}")
+    
+    def _auto_close_task_safe(self):
+        """Thread-safe auto-close task"""
+        if self.current_task:
+            # Show notification
+            if not self.is_minimized:
+                messagebox.showinfo("Task Auto-Closed", 
+                    f"Task '{self.current_task}' has been automatically closed after 2 hours.")
+            
+            # End the task
+            self.end_current_task()
+            print("Task auto-closed successfully after 2 hours")
+    
+    def test_timeout(self):
+        """Test timeout functionality with 10 seconds (for testing only)"""
+        if self.current_task:
+            # Cancel existing timer and start 10-second timer
+            if self.auto_close_timer:
+                self.auto_close_timer.cancel()
+            
+            self.auto_close_timer = threading.Timer(10, self.auto_close_task)
+            self.auto_close_timer.daemon = True
+            self.auto_close_timer.start()
+            print("Test timeout started - task will close in 10 seconds")
     
     def setup_system_tray_menu(self):
         """Setup right-click context menu for system tray functionality"""
